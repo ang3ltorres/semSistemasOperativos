@@ -12,3 +12,4 @@ function(add_program TARGET_NAME)
 endfunction()
 
 add_program(01_procesamientoPorLotes_1)
+add_program(02_procesamientoPorLotes_2)
