@@ -23,22 +23,28 @@ void Manager::loop()
 	{
 		finish = true;
 
-		for (auto& p : process)
+		for (auto i = process.begin(); i != process.end();)
 		{
 			std::cout << "\x1B[2J\x1B[H";
 			std::cout << *this;
 
-			int sleepTime = (p.time >= 3) ? 3 : p.time;
-			p.time -= sleepTime;
+			int sleepTime = (i->time >= 3) ? 3 : i->time;
+			i->time -= sleepTime;
 
 			if (sleepTime)
 			{
 				std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
 				finish = false;
+
+				if (i->time)
+					i++;
+				else
+					i = process.erase(i);
 			}
 		}
 	}
-	std::cout << "\nAll task finished\n";
+
+	std::cout << "\x1B[2J\x1B[HAll task finished\n";
 }
 
 std::ostream& operator<<(std::ostream& output, const Manager& manager)
