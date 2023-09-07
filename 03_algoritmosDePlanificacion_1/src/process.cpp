@@ -25,9 +25,18 @@ std::ostream& operator<<(std::ostream& output, const Process& process)
 {
 	output << std::format
 	(
-		"{:<25s}{:<12s}{:02d}",
+		"{:<24s}{:<10s}{:02d}",
 		process.name, std::format("{:04d}", process.time), process.priority
 	);
 
 	return output;
 }
+
+bool Process::operator<(const Process& p) const
+{
+	if (priority != p.priority)
+		return priority < p.priority;
+	else
+		return name < p.name;
+}
+

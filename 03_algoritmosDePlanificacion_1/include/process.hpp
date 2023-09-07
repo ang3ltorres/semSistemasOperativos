@@ -10,4 +10,6 @@ struct Process
 
 	friend std::istream& operator>>(std::istream& input, Process& process);
 	friend std::ostream& operator<<(std::ostream& output, const Process& process);
+
+	bool operator<(const Process& p) const;
 };

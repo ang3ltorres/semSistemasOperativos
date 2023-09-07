@@ -1,16 +1,29 @@
 #include "manager.hpp"
+#include "console.hpp"
 #include <fstream>
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <algorithm>
 
 Manager::Manager(const std::string& processFile)
+: it(nullptr)
 {
 	std::ifstream input(processFile, std::fstream::binary | std::fstream::in);
 
 	Process p;
 	while (input >> p)
 		process.push_back(p);
+
+	// Imprimir original
+	std::cout << console::clear << *this;
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+
+	// Imprimir ordenada
+	std::sort(process.begin(), process.end());
+	std::cout << console::clear << *this;
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+	
 
 	input.close();
 }
@@ -23,39 +36,49 @@ void Manager::loop()
 	{
 		finish = true;
 
-		for (auto i = process.begin(); i != process.end();)
+		for (it = process.begin(); it != process.end();)
 		{
-			std::cout << "\x1B[2J\x1B[H";
-			std::cout << *this;
-
-			int sleepTime = (i->time >= 3) ? 3 : i->time;
-			i->time -= sleepTime;
+			int sleepTime = (it->time >= 3) ? 3 : it->time;
 
 			if (sleepTime)
 			{
-				std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
 				finish = false;
 
-				if (i->time)
-					i++;
+				for (int j = 0; j < sleepTime; j++)
+				{
+					std::cout << console::clear << *this;
+					std::this_thread::sleep_for(std::chrono::seconds(1));
+					it->time--;
+				}
+
+				if (it->time)
+					it++;
 				else
-					i = process.erase(i);
+					it = process.erase(it);
 			}
 		}
 	}
 
-	std::cout << "\x1B[2J\x1B[HAll task finished\n";
+	std::cout << console::clear << console::colorF(0, 255, 0) << "Todos los procesos finalizados\n" << console::reset;
 }
 
 std::ostream& operator<<(std::ostream& output, const Manager& manager)
 {
-	output << std::format
+	output << console::colorB(255, 0, 255) << console::colorF(0, 255, 255) << std::format
 	(
-		"{:<24s}{:<10s}{:s}\n",
-		"Nombre", "Tiempo", "Prioridad"
-	);
+		"{:<24s}{:<10s}{:<14s}{:s}\n",
+		"Nombre", "Tiempo", "Prioridad", "Tiempo (barra)"
+	)
+	<< console::reset;
 
-	for (const auto& p : manager.process)
-		output << p << "\n";
+	for (auto p = manager.process.begin(); p != manager.process.end(); p++)
+	{
+		if (manager.it == p)
+			output << console::colorB(0, 255, 255) << console::colorF(255, 0, 255);
+		else
+			output << console::colorF(0, 255, 255);
+
+		output << *p << console::reset << console::colorF(220, 220, 220) << std::format("{:s}{:s}", std::string(12, ' '), std::string(p->time, char(219))) << console::reset << "\n";
+	}
 	return output;
 }
