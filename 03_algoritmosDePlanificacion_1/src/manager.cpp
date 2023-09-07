@@ -16,12 +16,14 @@ Manager::Manager(const std::string& processFile)
 		process.push_back(p);
 
 	// Imprimir original
-	std::cout << console::clear << *this;
+	console::clear();
+	std::cout << *this;
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 
 	// Imprimir ordenada
 	std::sort(process.begin(), process.end());
-	std::cout << console::clear << *this;
+	console::clear();
+	std::cout << *this;
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 	
 
@@ -46,7 +48,8 @@ void Manager::loop()
 
 				for (int j = 0; j < sleepTime; j++)
 				{
-					std::cout << console::clear << *this;
+					console::clear();
+					std::cout << *this;
 					std::this_thread::sleep_for(std::chrono::seconds(1));
 					it->time--;
 				}
@@ -59,7 +62,8 @@ void Manager::loop()
 		}
 	}
 
-	std::cout << console::clear << console::colorF(0, 255, 0) << "Todos los procesos finalizados\n" << console::reset;
+	console::clear();
+	std::cout << console::colorF(0, 255, 0) << "Todos los procesos finalizados\n" << console::reset;
 }
 
 std::ostream& operator<<(std::ostream& output, const Manager& manager)
