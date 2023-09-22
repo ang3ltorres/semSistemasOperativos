@@ -19,7 +19,8 @@ class ThreadTable(QThread):
 	def run(self):
 		while (self.window.manager.consume() and not self.stop):
 			self.signal.emit()
-			self.msleep(500)
+			if (self.window.manager.process):
+				self.msleep(500)
 
 		self.finished_signal.emit()
 
@@ -129,6 +130,7 @@ class MainWindow(QMainWindow):
 		file_name, _ = QFileDialog.getOpenFileName(self, 'Abrir archivo', '', 'Archivos de Texto (*.txt);;Todos los archivos (*)')
 		if file_name:
 			self.manager.load_process_from_file(file_name)
+			self.manager.set_algorithm(self.manager.algorithm)
 			self.refresh_table()
 
 	def insert(self, name: str, priority: int, time: int, end: bool):
