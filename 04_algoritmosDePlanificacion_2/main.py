@@ -56,6 +56,12 @@ class MainWindow(QMainWindow):
 		self.entry_process_insert_order.setChecked(True)
 		self.button_process_insert = QPushButton('Agregar', self.group_form)
 		self.button_process_insert.clicked.connect(lambda: self.insert(self.entry_process_name.text(), self.entry_process_priority.value(), self.entry_process_time.value(), self.entry_process_insert_order.isChecked()))
+		self.combobox_algorithm = QComboBox(self.group_form)
+		self.combobox_algorithm.addItem("Round Robin")
+		self.combobox_algorithm.addItem("SJF")
+		self.combobox_algorithm.addItem("FIFO")
+		self.combobox_algorithm.addItem("Prioridades")
+		self.combobox_algorithm.activated.connect(self.change_algorithm)
 
 		self.layout_group_form.addWidget(self.label_process_name, 0, 0)
 		self.layout_group_form.addWidget(self.entry_process_name, 0, 1)
@@ -65,6 +71,7 @@ class MainWindow(QMainWindow):
 		self.layout_group_form.addWidget(self.entry_process_priority, 2, 1)
 		self.layout_group_form.addWidget(self.label_process_insert_order, 3, 0)
 		self.layout_group_form.addWidget(self.entry_process_insert_order, 3, 1)
+		self.layout_group_form.addWidget(self.combobox_algorithm, 4, 0)
 		self.layout_group_form.addWidget(self.button_process_insert, 4, 1)
 
 		self.entry_process_time.setMinimum(1)
@@ -100,12 +107,16 @@ class MainWindow(QMainWindow):
 		self.thread_table.signal.connect(self.refresh_table)
 		self.thread_table.finished_signal.connect(self.thread_finished)
 
+	def change_algorithm(self):
+		self.manager.set_algorithm(Algorithm(self.combobox_algorithm.currentIndex()))
+		self.refresh_table()
+		print(self.manager.algorithm)
+
 	def start(self):
 		if self.thread_table.isRunning():
 			self.thread_table.stop = True
 			self.button_start.setText('Iniciar')
 		else:
-			self.manager.set_algorithm(Algorithm.rr)
 			self.thread_table.stop = False
 			self.thread_table.start()
 			self.button_start.setText('Detener')
@@ -133,7 +144,12 @@ class MainWindow(QMainWindow):
 			self.table.insertRow(row_pos)
 			self.table.setItem(row_pos, 0, QTableWidgetItem(self.manager.process[i].name))
 			self.table.setItem(row_pos, 1, QTableWidgetItem(str(self.manager.process[i].priority)))
-			self.table.setItem(row_pos, 2, QTableWidgetItem(str(self.manager.process[i].time)))
+
+			progressBar = QProgressBar()
+			progressBar.setValue(self.manager.process[i].time)
+			progressBar.setFormat('%v')
+			progressBar.setMaximum(20)
+			self.table.setCellWidget(row_pos, 2, progressBar)
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
