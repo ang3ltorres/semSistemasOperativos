@@ -40,13 +40,24 @@ PYBIND11_MODULE(processManager, m)
 		.value("rr", Manager::Algorithm::RR)
 		.value("sfj", Manager::Algorithm::SFJ)
 		.value("fifo", Manager::Algorithm::FIFO)
-		.value("prior", Manager::Algorithm::PRIOR);
+		.value("prior", Manager::Algorithm::PRIOR)
+		.value("default", Manager::Algorithm::DEFAULT);
 
 	py::class_<Manager>(m, "Manager")
 		.def(py::init<>())
 		.def_readwrite("process", &Manager::process)
 		.def_readwrite("index", &Manager::index)
+		.def_readwrite("consumePerProcess", &Manager::consumePerProcess)
+		.def_readwrite("currentConsumeCount", &Manager::currentConsumeCount)
 		.def_readwrite_static("algorithm", &Manager::algorithm)
+		.def("set_algorithm", &Manager::setAlgorithm)
 		.def("consume", &Manager::consume)
-		.def("load_process_from_file", &Manager::loadProcessFromFile);
+		.def("load_process_from_file", &Manager::loadProcessFromFile)
+		.def("push", [](Manager& self, const Process& p, bool end = true)
+		{
+			if (end)
+				self.process.push_back(p);
+			else
+				self.process.insert(self.process.begin(), p);
+		});
 }

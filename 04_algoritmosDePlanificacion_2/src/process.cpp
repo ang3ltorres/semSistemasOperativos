@@ -2,8 +2,7 @@
 
 #include <iostream>
 #include <format>
-#include <thread>
-#include <chrono>
+#include <sstream>
 
 Process::OrderBy Process::orderBy = Process::OrderBy::priority;
 
@@ -56,8 +55,7 @@ bool Process::operator<(const Process& p) const
 	}
 }
 
-void Process::consume(unsigned int ms)
+void Process::consume()
 {
-	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 	time--;
 }

@@ -13,11 +13,15 @@ struct Manager
 		SFJ,
 		FIFO,
 		PRIOR,
+		DEFAULT,
 	};
 	static Algorithm algorithm;
 
 	void loadProcessFromFile(const std::string fileName);
-	void consume();	
+	void setAlgorithm(Algorithm algorithm);
+	bool consume();	
 	std::vector<Process> process;
 	unsigned int index;
+	unsigned int consumePerProcess;
+	unsigned int currentConsumeCount;
 };

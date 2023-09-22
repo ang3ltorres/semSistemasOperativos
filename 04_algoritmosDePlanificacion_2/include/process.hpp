@@ -24,5 +24,5 @@ struct Process
 
 	bool operator<(const Process& p) const;
 
-	void consume(unsigned int ms);
+	void consume();
 };
