@@ -49,10 +49,8 @@ std::vector<Process> processFromFile(const std::string& fileName)
 MemoryBlock::MemoryBlock(unsigned int size)
 : totalSize(size) {}
 
-std::tuple<unsigned int, unsigned int> MemoryBlock::nextFreeSpace()
+std::tuple<unsigned int, unsigned int> MemoryBlock::nextFreeSpace(int& index)
 {
-	int index = -1;
-
 	while (index < int(process.size()))
 	{
 		int i = index;
@@ -103,8 +101,28 @@ Manager::Manager(std::initializer_list<unsigned int> memory)
 		this->memory.push_back(MemoryBlock(i));
 }
 
+std::vector<FreeSpaceInfo> Manager::getAllFreeSpace()
+{
+	std::vector<FreeSpaceInfo> v;
+	unsigned int pos, size;
+
+	// Iterar entre cada bloque de memoria
+	for (auto& b : memory)
+	{
+		int index = -1;
+		for (auto t = b.nextFreeSpace(index); t != std::make_tuple(0, 0); t = b.nextFreeSpace(index))
+		{
+			std::tie(pos, size) = t;
+			v.push_back(std::make_tuple(pos, size, std::ref(b)));
+		}
+	}
+	return v;
+}
+
 bool Manager::insertProcess(Process p)
 {
+	unsigned int pos, size;
+
 	switch(algorithm)
 	{
 		case Algorithm::PRIMER_AJUSTE:
@@ -112,22 +130,57 @@ bool Manager::insertProcess(Process p)
 			// Iterar entre cada bloque de memoria
 			for (auto& b : memory)
 			{
-				auto free = b.nextFreeSpace();
-				if (free != std::make_tuple(0, 0))
+				int index = -1;
+				std::tie(pos, size) = b.nextFreeSpace(index);
+
+				if (size >= p.size)
 				{
-					if (std::get<1>(free) >= p.size)
-					{
-						// Posicion correspondiente
-						p.pos = std::get<0>(free);
-						b.process.push_back(p);
-						std::sort(b.process.begin(), b.process.end());
-						return true;
-					}
+					// Posicion correspondiente
+					p.pos = pos;
+					b.process.push_back(p);
+					std::sort(b.process.begin(), b.process.end());
+					return true;
 				}
 			}
 			return false;
 		}
-		break;
+
+		case Algorithm::MEJOR_AJUSTE:
+		{
+			auto freeSpace = getAllFreeSpace();
+			FreeSpaceInfo smallestFit = freeSpace[0];
+			bool found = false;
+
+			for (const auto& free : freeSpace)
+			{
+				unsigned int size = std::get<1>(free);
+
+				if (!found)
+				{
+					if (size >= p.size)
+					{
+						smallestFit = free;
+						found = true;
+					}
+				}
+				else
+				{
+					if ((size >= p.size) and (size < std::get<1>(smallestFit)))
+						smallestFit = free;
+				}
+			}
+
+			if (found)
+			{
+				p.pos = std::get<0>(smallestFit);
+				MemoryBlock& memoryBlock = std::get<2>(smallestFit).get();
+				memoryBlock.process.push_back(p);
+				std::sort(memoryBlock.process.begin(), memoryBlock.process.end());
+				return true;
+			}
+
+			return false;
+		}
 
 		default:
 			throw "Algoritmo invalido";

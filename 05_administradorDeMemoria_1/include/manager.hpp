@@ -23,7 +23,7 @@ struct MemoryBlock
 	MemoryBlock(unsigned int size);
 	unsigned int totalSize;
 	std::vector<Process> process;
-	std::tuple<unsigned int, unsigned int> nextFreeSpace();
+	std::tuple<unsigned int, unsigned int> nextFreeSpace(int& index);
 
 	friend std::ostream& operator<<(std::ostream& output, const MemoryBlock& memoryBlock);
 };
@@ -36,10 +36,12 @@ enum Algorithm: unsigned int
 	SIGUIENTE_AJUSTE,
 };
 
+using FreeSpaceInfo = std::tuple<unsigned int, unsigned int, std::reference_wrapper<MemoryBlock>>;
 struct Manager
 {
 	Manager(std::initializer_list<unsigned int> memory);
 	Algorithm algorithm;
 	std::vector<MemoryBlock> memory;
+	std::vector<FreeSpaceInfo> getAllFreeSpace();
 	bool insertProcess(Process process);
 };
