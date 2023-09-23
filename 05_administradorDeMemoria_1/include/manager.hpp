@@ -3,6 +3,9 @@
 #include <string>
 #include <tuple>
 
+using FreeSpaceInfo = std::tuple<unsigned int, unsigned int, unsigned int>;
+using LastPosition = std::tuple<int, unsigned int>;
+
 struct Process
 {
 	Process(std::string name, unsigned int size);
@@ -36,12 +39,9 @@ enum Algorithm: unsigned int
 	SIGUIENTE_AJUSTE,
 };
 
-using FreeSpaceInfo = std::tuple<unsigned int, unsigned int, std::reference_wrapper<MemoryBlock>>;
-using LastPosition = std::tuple<int, unsigned int>;
-
 struct Manager
 {
-	Manager(std::initializer_list<unsigned int> memory);
+	Manager(const std::vector<unsigned int>& memory);
 
 	Algorithm algorithm;
 	LastPosition lastPosition;

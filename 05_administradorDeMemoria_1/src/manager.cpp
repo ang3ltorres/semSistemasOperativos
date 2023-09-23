@@ -93,7 +93,7 @@ std::ostream& operator<<(std::ostream& output, const MemoryBlock& memoryBlock)
 	return output;
 }
 
-Manager::Manager(std::initializer_list<unsigned int> memory)
+Manager::Manager(const std::vector<unsigned int>& memory)
 : algorithm(Algorithm::PRIMER_AJUSTE), lastPosition(std::make_tuple(-1, 0))
 {
 	for (const auto& i : memory)
@@ -106,13 +106,13 @@ std::vector<FreeSpaceInfo> Manager::getAllFreeSpace()
 	unsigned int pos, size;
 
 	// Iterar entre cada bloque de memoria
-	for (auto& b : memory)
+	for (unsigned int i = 0; i < memory.size(); i++)
 	{
 		int index = -1;
-		for (auto t = b.nextFreeSpace(index); t != std::make_tuple(0, 0); t = b.nextFreeSpace(index))
+		for (auto t = memory[i].nextFreeSpace(index); t != std::make_tuple(0, 0); t = memory[i].nextFreeSpace(index))
 		{
 			std::tie(pos, size) = t;
-			v.push_back(std::make_tuple(pos, size, std::ref(b)));
+			v.push_back(std::make_tuple(pos, size, i));
 		}
 	}
 	return v;
@@ -165,7 +165,7 @@ bool Manager::insertProcess(Process p)
 			if (found)
 			{
 				p.pos = std::get<0>(smallestFit);
-				MemoryBlock& memoryBlock = std::get<2>(smallestFit).get();
+				MemoryBlock& memoryBlock = memory[std::get<2>(smallestFit)];
 				memoryBlock.process.push_back(p);
 				std::sort(memoryBlock.process.begin(), memoryBlock.process.end());
 				return true;
@@ -196,7 +196,7 @@ bool Manager::insertProcess(Process p)
 			if (found)
 			{
 				p.pos = std::get<0>(biggestFit);
-				MemoryBlock& memoryBlock = std::get<2>(biggestFit).get();
+				MemoryBlock& memoryBlock = memory[std::get<2>(biggestFit)];
 				memoryBlock.process.push_back(p);
 				std::sort(memoryBlock.process.begin(), memoryBlock.process.end());
 				return true;
