@@ -155,25 +155,50 @@ bool Manager::insertProcess(Process p)
 			{
 				unsigned int size = std::get<1>(free);
 
-				if (!found)
+				if ((!found) and (size >= p.size))
 				{
-					if (size >= p.size)
-					{
-						smallestFit = free;
-						found = true;
-					}
+					smallestFit = free;
+					found = true;
 				}
-				else
-				{
-					if ((size >= p.size) and (size < std::get<1>(smallestFit)))
-						smallestFit = free;
-				}
+				else if ((size >= p.size) and (size < std::get<1>(smallestFit)))
+					smallestFit = free;
 			}
 
 			if (found)
 			{
 				p.pos = std::get<0>(smallestFit);
 				MemoryBlock& memoryBlock = std::get<2>(smallestFit).get();
+				memoryBlock.process.push_back(p);
+				std::sort(memoryBlock.process.begin(), memoryBlock.process.end());
+				return true;
+			}
+
+			return false;
+		}
+
+		case Algorithm::PEOR_AJUSTE:
+		{
+			auto freeSpace = getAllFreeSpace();
+			FreeSpaceInfo biggestFit = freeSpace[0];
+			bool found = false;
+
+			for (const auto& free : freeSpace)
+			{
+				unsigned int size = std::get<1>(free);
+
+				if ((!found) and (size >= p.size))
+				{
+					biggestFit = free;
+					found = true;
+				}
+				else if ((size >= p.size) and (size > std::get<1>(biggestFit)))
+					biggestFit = free;
+			}
+
+			if (found)
+			{
+				p.pos = std::get<0>(biggestFit);
+				MemoryBlock& memoryBlock = std::get<2>(biggestFit).get();
 				memoryBlock.process.push_back(p);
 				std::sort(memoryBlock.process.begin(), memoryBlock.process.end());
 				return true;
