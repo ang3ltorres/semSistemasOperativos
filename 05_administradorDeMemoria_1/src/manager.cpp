@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <format>
+#include <algorithm>
 
 Process::Process(std::string name, unsigned int size)
 : pos(0), size(size), name(name) {}
@@ -23,8 +24,8 @@ std::ostream& operator<<(std::ostream& output, const Process& process)
 {
 	output << std::format
 	(
-		"{:<24s}{:>12d}kb{:>12d}",
-		process.name, process.size, process.pos
+		"{:<24s}{:<12d}{:<12d}",
+		process.name, process.pos, process.size
 	);
 
 	return output;
@@ -96,6 +97,13 @@ std::tuple<unsigned int, unsigned int> MemoryBlock::nextFreeSpace(int& index)
 	return std::make_tuple(0, 0);
 }
 
+std::ostream& operator<<(std::ostream& output, const MemoryBlock& memoryBlock)
+{
+	for (const auto& p : memoryBlock.process)
+		output << p << "\n";
+	return output;
+}
+
 Manager::Manager(std::initializer_list<unsigned int> memory)
 : algorithm(Algorithm::PRIMER_AJUSTE)
 {
@@ -103,37 +111,31 @@ Manager::Manager(std::initializer_list<unsigned int> memory)
 		this->memory.push_back(MemoryBlock(i));
 }
 
-bool Manager::insertProcess(Process process)
+bool Manager::insertProcess(Process p)
 {
 	switch(algorithm)
 	{
 		case Algorithm::PRIMER_AJUSTE:
-		// {
-		// 	// Iterar entre cada bloque de memoria
-		// 	for (auto& b : memory)
-		// 	{
-		// 		// Iterar entre cada proceso del bloque
-
-		// 		// Cabe (Si estuviera vacio)
-		// 		if (b.totalSize >= process.size)
-		// 		{
-		// 			// Esta vacio
-		// 			if (b.process.empty())
-		// 			{
-		// 				process.pos = 0;
-		// 				b.process.push_back(process);
-		// 				return true;
-		// 			}
-		// 			else
-		// 			{
-		// 				for (auto it = b.process.begin(); it != b.process.end(); it++)
-		// 				{
-		// 					unsigned int spaceBetween = it->pos
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }
+		{
+			// Iterar entre cada bloque de memoria
+			for (auto& b : memory)
+			{
+				int index = -1;
+				auto free = b.nextFreeSpace(index);
+				if (free != std::make_tuple(0, 0))
+				{
+					if (std::get<1>(free) >= p.size)
+					{
+						// Posicion correspondiente
+						p.pos = std::get<0>(free);
+						b.process.push_back(p);
+						std::sort(b.process.begin(), b.process.end());
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 		break;
 
 		default:

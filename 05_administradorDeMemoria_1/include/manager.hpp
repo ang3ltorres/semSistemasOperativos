@@ -24,6 +24,8 @@ struct MemoryBlock
 	unsigned int totalSize;
 	std::vector<Process> process;
 	std::tuple<unsigned int, unsigned int> nextFreeSpace(int& index);
+
+	friend std::ostream& operator<<(std::ostream& output, const MemoryBlock& memoryBlock);
 };
 
 enum Algorithm: unsigned int

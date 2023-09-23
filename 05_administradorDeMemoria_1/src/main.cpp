@@ -6,7 +6,7 @@ int main()
 {
 	Manager manager
 	{
-		2000,
+		1000,
 		400,
 		1800,
 		700,
@@ -15,28 +15,13 @@ int main()
 		1500,
 	};
 
-	// auto process = processFromFile("./archivos.txt");
-
-	Process p1("System", 300);
-	p1.pos = 100;
-	manager.memory[0].process.push_back(p1);
-
-	Process p2("WinMain", 500);
-	p2.pos = 800;
-	manager.memory[0].process.push_back(p2);
-
-	Process p3("Word", 200);
-	p3.pos = 1400;
-	manager.memory[0].process.push_back(p3);
+	auto process = processFromFile("./archivos.txt");
+	for (const auto& p : process)
+		manager.insertProcess(p);
 	
+	for (unsigned int i = 0; i < manager.memory.size(); i++)
+		std::cout << "Bloque de memoria: " << i << "\n" << manager.memory[i] << "\n\n";
 
-	int index = -1;
-	std::tuple<unsigned int, unsigned int> free;
-	while ((free = manager.memory[0].nextFreeSpace(index)) != std::make_tuple(0, 0))
-		std::cout << "POS: " << std::get<0>(free) << "\t\tSIZE: " << std::get<1>(free) << '\n';
-
-	
-
-
+	std::cout << "Nice";
 	return 0;
 }
