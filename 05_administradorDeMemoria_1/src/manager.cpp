@@ -95,7 +95,7 @@ std::ostream& operator<<(std::ostream& output, const MemoryBlock& memoryBlock)
 }
 
 Manager::Manager(std::initializer_list<unsigned int> memory)
-: algorithm(Algorithm::PRIMER_AJUSTE)
+: algorithm(Algorithm::PRIMER_AJUSTE), lastPosition(std::make_tuple(-1, 0))
 {
 	for (const auto& i : memory)
 		this->memory.push_back(MemoryBlock(i));
@@ -121,8 +121,6 @@ std::vector<FreeSpaceInfo> Manager::getAllFreeSpace()
 
 bool Manager::insertProcess(Process p)
 {
-	unsigned int pos, size;
-
 	switch(algorithm)
 	{
 		case Algorithm::PRIMER_AJUSTE:
@@ -130,6 +128,7 @@ bool Manager::insertProcess(Process p)
 			// Iterar entre cada bloque de memoria
 			for (auto& b : memory)
 			{
+				unsigned int pos, size;
 				int index = -1;
 				std::tie(pos, size) = b.nextFreeSpace(index);
 
@@ -204,6 +203,33 @@ bool Manager::insertProcess(Process p)
 				return true;
 			}
 
+			return false;
+		}
+
+		case Algorithm::SIGUIENTE_AJUSTE:
+		{
+			int index;
+			unsigned int indexMemoryBlock;
+			std::tie(index, indexMemoryBlock) = lastPosition;
+
+			for (; indexMemoryBlock < memory.size(); indexMemoryBlock++)
+			{
+				unsigned int pos, size;
+				std::tie(pos, size) = memory[indexMemoryBlock].nextFreeSpace(index);
+
+				if (size >= p.size)
+				{
+					p.pos = pos;
+					memory[indexMemoryBlock].process.push_back(p);
+					std::sort(memory[indexMemoryBlock].process.begin(), memory[indexMemoryBlock].process.end());
+					lastPosition = std::make_tuple(index, indexMemoryBlock);
+					return true;
+				}
+				else
+					index = -1;
+			}
+
+			lastPosition = std::make_tuple(index, indexMemoryBlock);
 			return false;
 		}
 

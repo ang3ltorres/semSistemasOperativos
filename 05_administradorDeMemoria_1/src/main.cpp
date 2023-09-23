@@ -14,7 +14,7 @@ int main()
 		1200,
 		1500,
 	};
-	manager.algorithm = Algorithm::PEOR_AJUSTE;
+	manager.algorithm = Algorithm::SIGUIENTE_AJUSTE;
 
 	auto process = processFromFile("./archivos.txt");
 	for (const auto& p : process)

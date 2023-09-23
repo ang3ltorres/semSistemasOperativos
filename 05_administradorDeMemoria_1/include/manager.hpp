@@ -37,10 +37,13 @@ enum Algorithm: unsigned int
 };
 
 using FreeSpaceInfo = std::tuple<unsigned int, unsigned int, std::reference_wrapper<MemoryBlock>>;
+using LastPosition = std::tuple<int, unsigned int>;
+
 struct Manager
 {
 	Manager(std::initializer_list<unsigned int> memory);
 	Algorithm algorithm;
+	LastPosition lastPosition;
 	std::vector<MemoryBlock> memory;
 	std::vector<FreeSpaceInfo> getAllFreeSpace();
 	bool insertProcess(Process process);
