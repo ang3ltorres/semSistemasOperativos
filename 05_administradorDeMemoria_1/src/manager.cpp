@@ -88,9 +88,8 @@ std::tuple<unsigned int, unsigned int> MemoryBlock::nextFreeSpace(int& index)
 
 std::ostream& operator<<(std::ostream& output, const MemoryBlock& memoryBlock)
 {
-	std::cout << "Total size: " << memoryBlock.totalSize << '\n';
 	for (const auto& p : memoryBlock.process)
-		output << p << '\n';
+		output << "- " << p << '\n';
 	return output;
 }
 
@@ -236,4 +235,21 @@ bool Manager::insertProcess(Process p)
 		default:
 			throw "Algoritmo invalido";
 	}
+}
+
+bool Manager::insertProcess(const std::vector<Process>& process)
+{
+	bool allSucess = true;
+	for (const auto& p : process)
+		if (!insertProcess(p)) allSucess = false;
+	return allSucess;
+}
+
+std::ostream& operator<<(std::ostream& output, const Manager& manager)
+{
+	for (unsigned int i = 0; i < manager.memory.size(); i++)
+		output
+		<< std::format("{:d}: {:d}\n", i,  manager.memory[i].totalSize)
+		<< manager.memory[i] << '\n';
+	return output;
 }

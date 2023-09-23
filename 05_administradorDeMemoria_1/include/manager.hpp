@@ -12,8 +12,8 @@ struct Process
 	unsigned int size;
 	std::string name;
 
-	friend std::ostream& operator<<(std::ostream& output, const Process& process);
 	bool operator<(const Process& p) const;
+	friend std::ostream& operator<<(std::ostream& output, const Process& process);
 };
 
 std::vector<Process> processFromFile(const std::string& fileName);
@@ -42,9 +42,13 @@ using LastPosition = std::tuple<int, unsigned int>;
 struct Manager
 {
 	Manager(std::initializer_list<unsigned int> memory);
+
 	Algorithm algorithm;
 	LastPosition lastPosition;
 	std::vector<MemoryBlock> memory;
+
 	std::vector<FreeSpaceInfo> getAllFreeSpace();
 	bool insertProcess(Process process);
+	bool insertProcess(const std::vector<Process>& process);
+	friend std::ostream& operator<<(std::ostream& output, const Manager& manager);
 };

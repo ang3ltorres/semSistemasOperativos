@@ -14,15 +14,11 @@ int main()
 		1200,
 		1500,
 	};
-	manager.algorithm = Algorithm::SIGUIENTE_AJUSTE;
-
-	auto process = processFromFile("./archivos.txt");
-	for (const auto& p : process)
-		manager.insertProcess(p);
 	
-	for (unsigned int i = 0; i < manager.memory.size(); i++)
-		std::cout << "Bloque de memoria: " << i << "\n" << manager.memory[i] << "\n\n";
+	manager.algorithm = Algorithm::MEJOR_AJUSTE;
+	auto process = processFromFile("./archivos.txt");
+	manager.insertProcess(process);
+	std::cout << manager;
 
-	std::cout << "Nice";
 	return 0;
 }
