@@ -49,48 +49,39 @@ std::vector<Process> processFromFile(const std::string& fileName)
 MemoryBlock::MemoryBlock(unsigned int size)
 : totalSize(size) {}
 
-std::tuple<unsigned int, unsigned int> MemoryBlock::nextFreeSpace(int& index)
+std::tuple<unsigned int, unsigned int> MemoryBlock::nextFreeSpace()
 {
+	int index = -1;
+
 	while (index < int(process.size()))
 	{
-		if (process.empty())
-		{
-			index++;
-			return std::make_tuple(0, totalSize);
-		}
+		int i = index;
+		index++;
 
-		if (index == -1)
+		if (process.empty())
+			return std::make_tuple(0, totalSize);
+
+		if (i == -1)
 		{
-			index++;
 			if (process[0].pos != 0)
 				return std::make_tuple(0, process[0].pos);
+			else
+				continue;
 		}
 
-		if (index == int(process.size()) - 1)
+		if (i == int(process.size() - 1))
 		{
-			if ((process[index].pos + process[index].size) != totalSize)
-			{
-				index++;
-				return std::make_tuple(process[index-1].pos + process[index-1].size, totalSize - (process[index-1].pos + process[index-1].size));
-			}
+			if ((process[i].pos + process[i].size) != totalSize)
+				return std::make_tuple(process[i].pos + process[i].size, totalSize - (process[i].pos + process[i].size));
 			else
-			{
-				index++;
 				continue;
-			}
 		}
 		else
 		{
-			if (process[index+1].pos - (process[index].pos + process[index].size) > 0)
-			{
-				index++;
-				return std::make_tuple(process[index-1].pos + process[index-1].size, process[index].pos - (process[index-1].pos + process[index-1].size));
-			}
+			if (process[i+1].pos - (process[i].pos + process[i].size) > 0)
+				return std::make_tuple(process[i].pos + process[i].size, process[i+1].pos - (process[i].pos + process[i].size));
 			else
-			{
-				index++;
 				continue;
-			}
 		}
 
 	}
@@ -99,8 +90,9 @@ std::tuple<unsigned int, unsigned int> MemoryBlock::nextFreeSpace(int& index)
 
 std::ostream& operator<<(std::ostream& output, const MemoryBlock& memoryBlock)
 {
+	std::cout << "Total size: " << memoryBlock.totalSize << '\n';
 	for (const auto& p : memoryBlock.process)
-		output << p << "\n";
+		output << p << '\n';
 	return output;
 }
 
@@ -120,8 +112,7 @@ bool Manager::insertProcess(Process p)
 			// Iterar entre cada bloque de memoria
 			for (auto& b : memory)
 			{
-				int index = -1;
-				auto free = b.nextFreeSpace(index);
+				auto free = b.nextFreeSpace();
 				if (free != std::make_tuple(0, 0))
 				{
 					if (std::get<1>(free) >= p.size)

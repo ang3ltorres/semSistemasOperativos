@@ -23,7 +23,7 @@ struct MemoryBlock
 	MemoryBlock(unsigned int size);
 	unsigned int totalSize;
 	std::vector<Process> process;
-	std::tuple<unsigned int, unsigned int> nextFreeSpace(int& index);
+	std::tuple<unsigned int, unsigned int> nextFreeSpace();
 
 	friend std::ostream& operator<<(std::ostream& output, const MemoryBlock& memoryBlock);
 };
