@@ -46,6 +46,7 @@ PYBIND11_MODULE(memory_manager, m)
 		.def_readwrite("algorithm", &Manager::algorithm)
 		.def_readwrite("memory", &Manager::memory)
 		.def("insert_process", (bool (Manager::*)(const std::vector<Process>&)) &Manager::insertProcess)
+		.def("add_memory", &Manager::addMemoryBlock)
 		.def("__str__", [](const Manager& manager)
 		{
 			std::ostringstream os;

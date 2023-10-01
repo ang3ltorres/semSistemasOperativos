@@ -100,6 +100,14 @@ Manager::Manager(const std::vector<unsigned int>& memory)
 		this->memory.push_back(MemoryBlock(i));
 }
 
+void Manager::addMemoryBlock(unsigned int size, bool end)
+{
+	if (end)
+		memory.push_back(size);
+	else
+		memory.insert(memory.begin(), size);
+}
+
 std::vector<FreeSpaceInfo> Manager::getAllFreeSpace()
 {
 	std::vector<FreeSpaceInfo> v;

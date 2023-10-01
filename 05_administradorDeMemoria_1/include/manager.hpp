@@ -47,6 +47,7 @@ struct Manager
 	LastPosition lastPosition;
 	std::vector<MemoryBlock> memory;
 
+	void addMemoryBlock(unsigned int size, bool end = false);
 	std::vector<FreeSpaceInfo> getAllFreeSpace();
 	bool insertProcess(Process process);
 	bool insertProcess(const std::vector<Process>& process);
