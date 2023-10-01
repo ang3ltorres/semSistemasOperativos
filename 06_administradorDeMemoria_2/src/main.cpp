@@ -12,6 +12,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(memory_manager_2, m)
 {
 	py::class_<Process>(m, "Process")
+		.def(py::init<std::string, unsigned int>())
 		.def_readwrite("pos", &Process::pos)
 		.def_readwrite("size", &Process::size)
 		.def_readwrite("name", &Process::name)
@@ -46,8 +47,13 @@ PYBIND11_MODULE(memory_manager_2, m)
 		.def_readwrite("algorithm", &Manager::algorithm)
 		.def_readwrite("memory", &Manager::memory)
 		.def_readwrite("process_history", &Manager::processHistory)
+		.def("insert_process", (bool (Manager::*)(Process, bool)) &Manager::insertProcess,
+			py::arg("process"),
+			py::arg("add_to_history") = true)
 		.def("insert_process", (bool (Manager::*)(const std::vector<Process>&)) &Manager::insertProcess)
-		.def("add_memory", &Manager::addMemoryBlock)
+		.def("add_memory", &Manager::addMemoryBlock,
+			py::arg("size"),
+			py::arg("end") = true)
 		.def("refresh", &Manager::refresh)
 		.def("__str__", [](const Manager& manager)
 		{

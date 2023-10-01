@@ -48,7 +48,7 @@ struct Manager
 	std::vector<MemoryBlock> memory;
 	std::vector<Process> processHistory;
 
-	void addMemoryBlock(unsigned int size, bool end = false);
+	void addMemoryBlock(unsigned int size, bool end = true);
 	std::vector<FreeSpaceInfo> getAllFreeSpace();
 	bool insertProcess(Process p, bool addToHistory = true);
 	bool insertProcess(const std::vector<Process>& process);
